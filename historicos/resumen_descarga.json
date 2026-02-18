@@ -1,0 +1,14 @@
+{
+  "fecha_descarga": "2026-02-17",
+  "rango": {
+    "inicio": "2021-02-18",
+    "fin": "2026-02-17"
+  },
+  "duracion_segundos": 244.55,
+  "fechas_procesadas": 1304,
+  "activos": {
+    "ECOPETROL": 1304,
+    "NUTRESA": 1031,
+    "PFBCOLOM": 1107
+  }
+}
