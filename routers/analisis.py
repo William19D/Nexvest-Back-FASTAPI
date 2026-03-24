@@ -4,6 +4,7 @@ routers/analisis.py
 Endpoints para ejecutar analisis de ordenamiento sobre historicos.
 """
 
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
@@ -33,7 +34,11 @@ def analisis_ordenamiento(
     """
     ruta_base = Path(__file__).resolve().parents[1]
     ruta_historicos = ruta_base / "etl" / "historicos"
-    carpeta_salida = ruta_base / "etl" / "resultados_analisis"
+    # Vercel tiene sistema de archivos de solo lectura; /tmp es el unico directorio escribible.
+    if os.environ.get("VERCEL"):
+        carpeta_salida = Path("/tmp") / "resultados_analisis"
+    else:
+        carpeta_salida = ruta_base / "etl" / "resultados_analisis"
 
     try:
         resultado = ejecutar_analisis_ordenamiento(
