@@ -20,14 +20,16 @@ from pymongo.server_api import ServerApi
 from pymongo import UpdateOne
 
 # ── MongoDB connection ────────────────────────────────────────────────────────
-MONGO_URI = (
-    "mongodb+srv://nextVest_db_user:W0UiUrEoCgAH40x2"
-    "@nexvest.kujeo6o.mongodb.net/?appName=NexVest"
-)
+MONGO_URI: str = os.getenv("MONGO_URI", "")
+if not MONGO_URI:
+    raise EnvironmentError(
+        "MONGO_URI is not set. Please add it to your .env file.\n"
+        "See .env.example for reference."
+    )
 DB_NAME = "nexvest"
 
 # ── Path to historical data ───────────────────────────────────────────────────
-HISTORICOS_DIR = Path(__file__).resolve().parent.parent / "historicos"
+HISTORICOS_DIR = Path(__file__).resolve().parent.parent / "etl/historicos"
 
 
 def get_client() -> MongoClient:

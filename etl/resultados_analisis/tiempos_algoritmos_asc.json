@@ -1,0 +1,74 @@
+[
+  {
+    "Metodo": "RadixSort",
+    "Tamano": 24903,
+    "Tiempo": "0.003148 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "TimSort",
+    "Tamano": 24903,
+    "Tiempo": "0.004706 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Bucket Sort",
+    "Tamano": 24903,
+    "Tiempo": "0.011271 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Pigeonhole Sort",
+    "Tamano": 24903,
+    "Tiempo": "0.013873 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "HeapSort",
+    "Tamano": 24903,
+    "Tiempo": "0.131636 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "QuickSort",
+    "Tamano": 24903,
+    "Tiempo": "0.138232 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Comb Sort",
+    "Tamano": 24903,
+    "Tiempo": "0.142264 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Bitonic Sort",
+    "Tamano": 24903,
+    "Tiempo": "0.419567 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Tree Sort",
+    "Tamano": 24903,
+    "Tiempo": "1.584313 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Binary Insertion Sort",
+    "Tamano": 24903,
+    "Tiempo": "23.593871 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Selection Sort",
+    "Tamano": 24903,
+    "Tiempo": "39.692005 seg",
+    "Estado": "OK"
+  },
+  {
+    "Metodo": "Gnome Sort",
+    "Tamano": 24903,
+    "Tiempo": "54.126690 seg",
+    "Estado": "OK"
+  }
+]

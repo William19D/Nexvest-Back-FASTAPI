@@ -41,16 +41,35 @@ class Node:
         self.left = self.right = None
 
 def insert(root, val):
-    if root is None: return Node(val)
-    if es_menor(val, root.val): root.left = insert(root.left, val)
-    else: root.right = insert(root.right, val)
+    if root is None:
+        return Node(val)
+
+    # Insercion iterativa para evitar RecursionError con datasets grandes.
+    actual = root
+    while True:
+        if es_menor(val, actual.val):
+            if actual.left is None:
+                actual.left = Node(val)
+                break
+            actual = actual.left
+        else:
+            if actual.right is None:
+                actual.right = Node(val)
+                break
+            actual = actual.right
     return root
 
 def inorder(root, res):
-    if root:
-        inorder(root.left, res)
-        res.append(root.val)
-        inorder(root.right, res)
+    # Recorrido inorder iterativo para evitar recursion profunda.
+    stack = []
+    actual = root
+    while stack or actual is not None:
+        while actual is not None:
+            stack.append(actual)
+            actual = actual.left
+        actual = stack.pop()
+        res.append(actual.val)
+        actual = actual.right
 
 def tree_sort(data):
     if not data: return []
@@ -63,15 +82,16 @@ def tree_sort(data):
 
 
 def pigeonhole_sort(data, key='volumen'):
-    min_val = min(d[key] for d in data)
-    max_val = max(d[key] for d in data)
-    size = int(max_val - min_val + 1)
-    holes = [[] for _ in range(size)]
+    # Variante robusta para rangos muy grandes: agrupa por valor exacto.
+    # Evita reservar un arreglo gigantesco cuando max-min es enorme.
+    holes = {}
     for x in data:
-        holes[int(x[key] - min_val)].append(x)
+        hole_key = int(x[key])
+        holes.setdefault(hole_key, []).append(x)
+
     res = []
-    for hole in holes:
-        res.extend(hole)
+    for hole_key in sorted(holes.keys()):
+        res.extend(holes[hole_key])
     return res
 
 def bucket_sort(data):

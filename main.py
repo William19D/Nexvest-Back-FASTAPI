@@ -7,7 +7,7 @@ NexVest FastAPI application entry point.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import historicos
+from routers import analisis, historicos
 
 app = FastAPI(
     title="NexVest API",
@@ -26,6 +26,7 @@ app.add_middleware(
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(historicos.router)
+app.include_router(analisis.router)
 
 
 @app.get("/", tags=["Health"])
