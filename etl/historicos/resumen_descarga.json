@@ -1,32 +1,32 @@
 {
-  "fecha_descarga": "2026-02-18",
+  "fecha_descarga": "2026-03-24",
   "rango": {
-    "inicio": "2021-02-19",
-    "fin": "2026-02-18"
+    "inicio": "2021-03-25",
+    "fin": "2026-03-24"
   },
-  "duracion_segundos": 183.37,
+  "duracion_segundos": 178.83,
   "fechas_procesadas": 1304,
   "bvc_activos": {
     "ECOPETROL": 1304,
     "ISA": 1304,
     "GEB": 1296,
-    "PFBCOLOM": 1106,
-    "NUTRESA": 1030,
+    "PFBCOLOM": 1082,
+    "NUTRESA": 1019,
     "GRUPOSURA": 1249,
     "CELSIA": 1293,
     "EXITO": 1089,
     "CEMARGOS": 1295,
-    "CNEC": 1182,
-    "CORFICOLCF": 1282,
+    "CNEC": 1158,
+    "CORFICOLCF": 1283,
     "PROMIGAS": 1125,
-    "MINEROS": 1187,
-    "CLH": 444,
-    "PFDAVVNDA": 1276
+    "MINEROS": 1186,
+    "CLH": 421,
+    "PFDAVVNDA": 1271
   },
   "yahoo_activos": {
-    "CSPX.L": 1259,
-    "VOO": 1254,
     "SPY": 1254,
+    "CSPX.L": 1258,
+    "VOO": 1254,
     "QQQ": 1254,
     "IVV": 1254,
     "GLD": 1254
