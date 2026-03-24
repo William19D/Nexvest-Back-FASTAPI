@@ -48,7 +48,7 @@ YAHOO_ASSETS = ["VOO", "CSPX.L", "SPY", "QQQ", "IVV", "GLD"]
 
 YEARS_BACK     = 5
 MAX_RETRY_DAYS = 7
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "historicos")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "etl/historicos")
 
 # Ajusta según tu conexión. 20-30 es el sweet spot para la BVC.
 BVC_WORKERS   = 25
