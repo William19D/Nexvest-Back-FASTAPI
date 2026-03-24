@@ -29,7 +29,7 @@ if not MONGO_URI:
 DB_NAME = "nexvest"
 
 # ── Path to historical data ───────────────────────────────────────────────────
-HISTORICOS_DIR = Path(__file__).resolve().parent.parent / "etl/historicos"
+HISTORICOS_DIR = Path(__file__).resolve().parent.parent / "historicos"
 
 
 def get_client() -> MongoClient:
