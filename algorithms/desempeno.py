@@ -26,12 +26,12 @@ def _bitonic_sort_wrapper(data):
     return data_ext[:n]
 
 
-def cargar_dataset_desde_historicos(ruta_historicos):
+def cargar_dataset_desde_historicos(ruta_hist):
     """
     Carga y unifica todos los archivos *_historico.json de una carpeta.
     Retorna una lista de dicts con llaves: fecha, close, volumen, ticker.
     """
-    base = Path(ruta_historicos)
+    base = Path(ruta_hist)
     if not base.exists():
         raise FileNotFoundError(f"No existe la ruta: {base}")
 
@@ -56,14 +56,14 @@ def cargar_dataset_desde_historicos(ruta_historicos):
             return None
         return int(num)
 
-    dataset_unificado = []
+    datos_unif = []
     archivos = sorted(base.glob("*_historico.json"))
 
     for archivo in archivos:
         if archivo.name == "resumen_descarga.json":
             continue
 
-        ticker_archivo = archivo.name.replace("_historico.json", "")
+        tic_arch = archivo.name.replace("_historico.json", "")
 
         with archivo.open("r", encoding="utf-8") as f:
             contenido = json.load(f)
@@ -78,12 +78,12 @@ def cargar_dataset_desde_historicos(ruta_historicos):
             if volumen is None:
                 volumen = fila.get("volume")
             volumen = _to_int(volumen)
-            ticker = fila.get("ticker") or fila.get("mnemonic") or ticker_archivo
+            ticker = fila.get("ticker") or fila.get("mnemonic") or tic_arch
 
             if fecha is None or close is None or volumen is None:
                 continue
 
-            dataset_unificado.append(
+            datos_unif.append(
                 {
                     "fecha": fecha,
                     "close": close,
@@ -92,9 +92,9 @@ def cargar_dataset_desde_historicos(ruta_historicos):
                 }
             )
 
-    return dataset_unificado
+    return datos_unif
 
-def medir_desempeno_ordenamiento(dataset_unificado):
+def medir_desempeno_ordenamiento(datos_unif):
     """
     Ejecuta los 12 algoritmos y retorna una lista de resultados
     con el nombre, tamaño del dataset y tiempo de ejecución.
@@ -114,62 +114,62 @@ def medir_desempeno_ordenamiento(dataset_unificado):
         ("RadixSort", algoritmos_ordenamiento.radix_sort)
     ]
     
-    resultados_tabla = []
-    tamanio_datos = len(dataset_unificado) # Tamaño del dato entero [cite: 33]
+    res_tabla = []
+    tam_datos = len(datos_unif) # Tamaño del dato entero [cite: 33]
 
     for nombre, func in algoritmos:
         # Creamos una copia para no afectar el dataset original en cada iteración
-        datos_copia = list(dataset_unificado)
+        datos_cpy = list(datos_unif)
 
         try:
             inicio = time.perf_counter()
-            func(datos_copia)
+            func(datos_cpy)
             fin = time.perf_counter()
 
             tiempo_total = fin - inicio
-            resultados_tabla.append(
+            res_tabla.append(
                 {
                     "Metodo": nombre,
-                    "Tamano": tamanio_datos,
+                    "Tamano": tam_datos,
                     "Tiempo": f"{tiempo_total:.6f} seg",
                     "Estado": "OK",
                 }
             )
             print(f"✅ {nombre} finalizado en {tiempo_total:.6f} segundos.")
         except Exception as exc:
-            resultados_tabla.append(
+            res_tabla.append(
                 {
                     "Metodo": nombre,
-                    "Tamano": tamanio_datos,
+                    "Tamano": tam_datos,
                     "Tiempo": "N/A",
                     "Estado": f"ERROR: {type(exc).__name__}",
                 }
             )
             print(f"⚠️ {nombre} fallo: {type(exc).__name__}: {exc}")
 
-    return resultados_tabla
+    return res_tabla
 
 
-def ordenar_dataset_unificado(dataset_unificado):
+def ordenar_dataset_unificado(datos_unif):
     """Ordena ascendente por fecha y luego por close usando TimSort."""
-    return algoritmos_ordenamiento.tim_sort(list(dataset_unificado))
+    return algoritmos_ordenamiento.tim_sort(list(datos_unif))
 
 
-def parse_tiempo_segundos(valor_tiempo):
-    if not isinstance(valor_tiempo, str) or valor_tiempo == "N/A":
+def parse_tiempo_segundos(val_tiempo):
+    if not isinstance(val_tiempo, str) or val_tiempo == "N/A":
         return None
-    if not valor_tiempo.endswith(" seg"):
+    if not val_tiempo.endswith(" seg"):
         return None
     try:
-        return float(valor_tiempo.replace(" seg", ""))
+        return float(val_tiempo.replace(" seg", ""))
     except ValueError:
         return None
 
 
-def ordenar_tiempos_ascendente(resultados_tabla):
+def ordenar_tiempos_ascendente(res_tabla):
     """Ordena ascendente por tiempo de ejecucion; errores al final."""
     return sorted(
-        resultados_tabla,
+        res_tabla,
         key=lambda r: (
             parse_tiempo_segundos(r.get("Tiempo")) is None,
             parse_tiempo_segundos(r.get("Tiempo")) or float("inf"),
@@ -177,7 +177,7 @@ def ordenar_tiempos_ascendente(resultados_tabla):
     )
 
 
-def generar_grafico_barras_tiempos(resultados_ordenados, ruta_salida):
+def generar_grafico_barras_tiempos(res_ord, ruta_graf):
     """Genera diagrama de barras horizontal (ascendente) de los 12 algoritmos."""
     try:
         import matplotlib.pyplot as plt
@@ -189,7 +189,7 @@ def generar_grafico_barras_tiempos(resultados_ordenados, ruta_salida):
         return False
 
     validos = [
-        r for r in resultados_ordenados if parse_tiempo_segundos(r.get("Tiempo")) is not None
+        r for r in res_ord if parse_tiempo_segundos(r.get("Tiempo")) is not None
     ]
     if not validos:
         print("⚠️ No hay tiempos validos para graficar.")
@@ -214,24 +214,24 @@ def generar_grafico_barras_tiempos(resultados_ordenados, ruta_salida):
         )
 
     plt.tight_layout()
-    plt.savefig(ruta_salida, dpi=150)
+    plt.savefig(ruta_graf, dpi=150)
     plt.close()
     return True
 
 
-def top_15_mayor_volumen_por_activo(dataset_unificado):
+def top_15_mayor_volumen_por_activo(datos_unif):
     """
     Para cada ticker:
     1) toma los 15 dias con mayor volumen,
     2) los devuelve ordenados ascendente por volumen.
     """
-    por_ticker = {}
-    for fila in dataset_unificado:
+    por_tic = {}
+    for fila in datos_unif:
         ticker = fila.get("ticker") or "SIN_TICKER"
-        por_ticker.setdefault(ticker, []).append(fila)
+        por_tic.setdefault(ticker, []).append(fila)
 
     salida = {}
-    for ticker, filas in por_ticker.items():
+    for ticker, filas in por_tic.items():
         top_desc = sorted(filas, key=lambda x: x["volumen"], reverse=True)[:15]
         top_asc = sorted(top_desc, key=lambda x: (x["volumen"], x["fecha"], x["close"]))
         salida[ticker] = top_asc
@@ -246,17 +246,17 @@ def guardar_json(ruta, data):
 
 
 def ejecutar_analisis_ordenamiento(
-    ruta_historicos,
+    ruta_hist,
     max_registros=0,
     carpeta_salida=None,
     generar_grafico=True,
 ):
     """Ejecuta el analisis completo y devuelve los resultados en memoria."""
-    dataset = cargar_dataset_desde_historicos(ruta_historicos)
+    datos = cargar_dataset_desde_historicos(ruta_hist)
     if max_registros and max_registros > 0:
-        dataset = dataset[:max_registros]
+        datos = datos[:max_registros]
 
-    if not dataset:
+    if not datos:
         raise ValueError("No se encontraron datos validos para analizar.")
 
     if carpeta_salida is None:
@@ -264,34 +264,34 @@ def ejecutar_analisis_ordenamiento(
     else:
         carpeta_salida = Path(carpeta_salida)
 
-    dataset_ordenado = ordenar_dataset_unificado(dataset)
-    resultados = medir_desempeno_ordenamiento(dataset)
-    resultados_asc = ordenar_tiempos_ascendente(resultados)
-    top_15_por_activo = top_15_mayor_volumen_por_activo(dataset)
+    datos_ord = ordenar_dataset_unificado(datos)
+    resultados = medir_desempeno_ordenamiento(datos)
+    res_asc = ordenar_tiempos_ascendente(resultados)
+    top15_activo = top_15_mayor_volumen_por_activo(datos)
 
-    ruta_dataset_ordenado = carpeta_salida / "dataset_unificado_ordenado.json"
-    ruta_tiempos = carpeta_salida / "tiempos_algoritmos_asc.json"
-    ruta_top_15 = carpeta_salida / "top_15_mayor_volumen_por_activo.json"
-    ruta_grafico = carpeta_salida / "tiempos_algoritmos_barras_asc.png"
+    ruta_datos_ord = carpeta_salida / "dataset_unificado_ordenado.json"
+    ruta_tiem = carpeta_salida / "tiempos_algoritmos_asc.json"
+    ruta_top15 = carpeta_salida / "top_15_mayor_volumen_por_activo.json"
+    ruta_graf = carpeta_salida / "tiempos_algoritmos_barras_asc.png"
 
-    guardar_json(ruta_dataset_ordenado, dataset_ordenado)
-    guardar_json(ruta_tiempos, resultados_asc)
-    guardar_json(ruta_top_15, top_15_por_activo)
+    guardar_json(ruta_datos_ord, datos_ord)
+    guardar_json(ruta_tiem, res_asc)
+    guardar_json(ruta_top15, top15_activo)
 
-    grafico_generado = False
+    graf_gen = False
     if generar_grafico:
-        grafico_generado = generar_grafico_barras_tiempos(resultados_asc, ruta_grafico)
+        graf_gen = generar_grafico_barras_tiempos(res_asc, ruta_graf)
 
     return {
-        "total_registros": len(dataset),
-        "dataset_ordenado": dataset_ordenado,
-        "resultados_tiempos": resultados_asc,
-        "top_15_por_activo": top_15_por_activo,
+        "total_registros": len(datos),
+        "dataset_ordenado": datos_ord,
+        "resultados_tiempos": res_asc,
+        "top_15_por_activo": top15_activo,
         "rutas_archivos": {
-            "dataset_ordenado": str(ruta_dataset_ordenado),
-            "tiempos_asc": str(ruta_tiempos),
-            "top_15": str(ruta_top_15),
-            "grafico_barras": str(ruta_grafico) if grafico_generado else None,
+            "dataset_ordenado": str(ruta_datos_ord),
+            "tiempos_asc": str(ruta_tiem),
+            "top_15": str(ruta_top15),
+            "grafico_barras": str(ruta_graf) if graf_gen else None,
         },
     }
 
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 
     try:
         analisis = ejecutar_analisis_ordenamiento(
-            ruta_historicos=args.ruta_historicos,
+            ruta_hist=args.ruta_historicos,
             max_registros=args.max_registros,
             carpeta_salida=args.carpeta_salida,
             generar_grafico=True,
